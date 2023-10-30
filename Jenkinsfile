@@ -13,25 +13,36 @@ pipeline {
     stage('App Build') {
       steps {
         script {
-          sh 'chmod +x ./scripts/build.sh'
+          def customImage = docker.build("${registry}:latest")
+          customImage.inside{ c->
           sh './scripts/build.sh'
         }
-
       }
+
     }
+  }
 
-    stage('Tests') {
-      steps {
-        script {
-          sh 'chmod +x ./scripts/test.sh'
-          sh './scripts/test.sh'
-        }
-
+  stage('Tests') {
+    steps {
+      script {
+        sh 'chmod +x ./scripts/test.sh'
+        sh './scripts/test.sh'
       }
-    }
 
+    }
   }
-  environment {
-    registry = 'serhiidubovchuk'
+
+  stage('Docker Image Build') {
+    steps {
+      script {
+        docker build -t mybuildimage
+      }
+
+    }
   }
+
+}
+environment {
+  registry = 'serhiidubovchuk'
+}
 }
