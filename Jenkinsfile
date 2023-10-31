@@ -39,8 +39,19 @@ pipeline {
       }
     }
 
+    stage('Docker Image Push') {
+      steps {
+        script {
+          docker.withRegistry("", "dockerhub-id") {
+            docker.image("${registry}:latest").push("latest")
+          }
+        }
+
+      }
+    }
+
   }
   environment {
-    registry = 'serhiidubovchuk'
+    registry = 'serhiidubovchuk/flask-app'
   }
 }
