@@ -10,11 +10,13 @@ pipeline {
       }
     }
 
-    stage('App Build') {
+    stage('Build (Docker & App)') {
       steps {
         script {
-          sh 'chmod +x ./scripts/build.sh'
-          sh './scripts/build.sh'
+		      docker.build("${registry}:latest").inside{ c->
+			      sh 'chmod +x ./scripts/build.sh'
+			      sh './scripts/build.sh'
+		      }
         }
 
       }
@@ -23,17 +25,10 @@ pipeline {
     stage('Tests') {
       steps {
         script {
-          sh 'chmod +x ./scripts/test.sh'
-          sh './scripts/test.sh'
-        }
-
-      }
-    }
-
-    stage('Docker Image Build') {
-      steps {
-        script {
-          docker.build("${registry}:latest")
+		      docker.image("${registry}:latest").inside{ c->
+      			sh 'chmod +x ./scripts/test.sh'
+      			sh './scripts/test.sh'
+		      }
         }
 
       }
